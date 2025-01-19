@@ -17,6 +17,7 @@ opt-level = 3
 
 [dependencies]
 bevy = "0.17"
+bracket-lib = { git = "https://github.com/alkumis/bracket-lib" }
 
 # These lints may be important signals about code quality, but normal Bevy code
 # commonly triggers them and the CI workflow treats them as errors, so we've

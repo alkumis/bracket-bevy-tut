@@ -1,7 +1,6 @@
 use bevy::asset::AssetMetaCheck;
 use bevy::prelude::*;
 use bracket_lib::bevy::*;
-use std::cmp::{max, min};
 
 fn main() {
     App::new()
@@ -46,7 +45,10 @@ fn setup(mut commands: Commands) {
         .insert(Player);
 }
 
-fn move_player(kb_input: Res<ButtonInput<KeyCode>>, mut query: Query<&mut Position, With<Player>>) {
+fn move_player(
+    kb_input: Res<ButtonInput<KeyCode>>,
+    mut player_pos: Query<&mut Position, With<Player>>,
+) {
     if let Some(kbi) = kb_input.get_pressed().next() {
         let (player_x, player_y) = match kbi {
             KeyCode::ArrowUp | KeyCode::KeyW => (0, -1),
@@ -56,17 +58,17 @@ fn move_player(kb_input: Res<ButtonInput<KeyCode>>, mut query: Query<&mut Positi
             _ => (0, 0),
         };
 
-        query.par_iter_mut().for_each(|mut pos| {
-            pos.x = min(79, max(0, pos.x + player_x));
-            pos.y = min(49, max(0, pos.y + player_y));
-        });
+        if let Some(mut pos) = player_pos.single_mut().into() {
+            pos.x = (pos.x + player_x).clamp(0, 79);
+            pos.y = (pos.y + player_y).clamp(0, 49);
+        }
     }
 }
 
-fn render(ctx: Res<BracketContext>, query: Query<(&Position, &Renderable)>) {
+fn render(ctx: Res<BracketContext>, renderables: Query<(&Position, &Renderable)>) {
     ctx.cls();
 
-    query.par_iter().for_each(|(pos, render)| {
+    renderables.par_iter().for_each(|(pos, render)| {
         ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph);
     });
 }

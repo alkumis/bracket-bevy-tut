@@ -1,7 +1,7 @@
 use bevy::asset::AssetMetaCheck;
 use bevy::prelude::*;
 use bracket_lib::bevy::*;
-// use bracket_lib::prelude::FontCharType;
+use std::cmp::{max, min};
 
 fn main() {
     App::new()
@@ -14,7 +14,7 @@ fn main() {
         }))
         .add_plugins(BTermBuilder::simple_80x50())
         .add_systems(Startup, setup)
-        .add_systems(Update, tick)
+        .add_systems(Update, (move_player, render).chain())
         .run();
 }
 
@@ -31,6 +31,9 @@ struct Position {
     y: i32,
 }
 
+#[derive(Component)]
+struct Player;
+
 fn setup(mut commands: Commands) {
     commands
         .spawn_empty()
@@ -39,13 +42,31 @@ fn setup(mut commands: Commands) {
             fg: RGB::named(YELLOW),
             bg: RGB::named(BLACK),
         })
-        .insert(Position { x: 0, y: 0 });
+        .insert(Position { x: 0, y: 0 })
+        .insert(Player);
 }
 
-fn tick(ctx: Res<BracketContext>, query: Query<(&Position, &Renderable)>) {
+fn move_player(kb_input: Res<ButtonInput<KeyCode>>, mut query: Query<&mut Position, With<Player>>) {
+    if let Some(kbi) = kb_input.get_pressed().next() {
+        let (player_x, player_y) = match kbi {
+            KeyCode::ArrowUp | KeyCode::KeyW => (0, -1),
+            KeyCode::ArrowDown | KeyCode::KeyS => (0, 1),
+            KeyCode::ArrowLeft | KeyCode::KeyA => (-1, 0),
+            KeyCode::ArrowRight | KeyCode::KeyD => (1, 0),
+            _ => (0, 0),
+        };
+
+        query.par_iter_mut().for_each(|mut pos| {
+            pos.x = min(79, max(0, pos.x + player_x));
+            pos.y = min(49, max(0, pos.y + player_y));
+        });
+    }
+}
+
+fn render(ctx: Res<BracketContext>, query: Query<(&Position, &Renderable)>) {
     ctx.cls();
 
-    for (pos, render) in query.iter() {
+    query.par_iter().for_each(|(pos, render)| {
         ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph);
-    }
+    });
 }

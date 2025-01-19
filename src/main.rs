@@ -14,6 +14,7 @@ fn main() {
         }))
         .add_plugins(BTermBuilder::simple_80x50())
         .add_systems(Startup, setup)
+        .add_systems(Update, tick)
         .run();
 }
 
@@ -39,4 +40,12 @@ fn setup(mut commands: Commands) {
             bg: RGB::named(BLACK),
         })
         .insert(Position { x: 0, y: 0 });
+}
+
+fn tick(ctx: Res<BracketContext>, query: Query<(&Position, &Renderable)>) {
+    ctx.cls();
+
+    for (pos, render) in query.iter() {
+        ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph);
+    }
 }

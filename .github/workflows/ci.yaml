@@ -31,7 +31,7 @@ jobs:
       - name: Install stable toolchain
         uses: dtolnay/rust-toolchain@stable
       - name: Install Dependencies
-        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev libwayland-dev
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev libwayland-dev libfontconfig1-dev
       - name: Run cargo test
         run: cargo test
 
@@ -58,7 +58,11 @@ jobs:
         with:
           components: clippy
       - name: Install Dependencies
+<<<<<<< HEAD
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev libwayland-dev
+=======
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev libfontconfig1-dev
+>>>>>>> 3ff9ef9 (Added a char and fixes to CI workflows)
       - name: Run clippy
         run: cargo clippy -- -D warnings
 

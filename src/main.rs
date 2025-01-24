@@ -1,3 +1,8 @@
+mod components;
+mod map;
+mod player;
+mod render;
+
 use bevy::asset::AssetMetaCheck;
 use bevy::prelude::*;
 use bracket_lib::bevy::*;
@@ -13,10 +18,19 @@ fn main() {
             ..default()
         }))
         .add_plugins(BTermBuilder::simple_80x50())
+        .configure_sets(Update, (AppSet::RecordInput, AppSet::Update).chain())
         .insert_resource(Map::new())
-        .add_systems(Startup, (init_player, draw_map).chain())
+        .add_systems(Startup, (init_player, draw_map))
         .add_systems(Update, (move_player, render).chain())
         .run();
+}
+
+#[derive(SystemSet, Debug, Clone, Copy, Eq, PartialEq, Hash, PartialOrd, Ord)]
+enum AppSet {
+    /// Record player input.
+    RecordInput,
+    /// Do everything else (consider splitting this into further variants).
+    Update,
 }
 
 #[derive(Component)]

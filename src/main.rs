@@ -92,37 +92,31 @@ fn init_player(mut commands: Commands) {
 }
 
 fn draw_map(mut commands: Commands, map: Res<Map>) {
-    let (mut x, mut y) = (0, 0);
-    for tile in map.tiles.iter() {
-        match tile {
-            TileType::Floor => {
-                commands
-                    .spawn_empty()
-                    .insert(Renderable {
-                        glyph: to_cp437('.'),
-                        fg: RGB::named(GRAY),
-                        bg: RGB::named(BLACK),
-                    })
-                    .insert(Position { x, y })
-                    .insert(TileType::Floor);
+    for y in 0..50 {
+        for x in 0..80 {
+            let idx = xy_idx(x, y);
+            match map.tiles[idx] {
+                TileType::Floor => {
+                    commands
+                        .spawn_empty()
+                        .insert(Renderable {
+                            glyph: to_cp437('.'),
+                            fg: RGB::named(GRAY),
+                            bg: RGB::named(BLACK),
+                        })
+                        .insert(Position { x, y });
+                }
+                TileType::Wall => {
+                    commands
+                        .spawn_empty()
+                        .insert(Renderable {
+                            glyph: to_cp437('#'),
+                            fg: RGB::named(GREEN),
+                            bg: RGB::named(BLACK),
+                        })
+                        .insert(Position { x, y });
+                }
             }
-            TileType::Wall => {
-                commands
-                    .spawn_empty()
-                    .insert(Renderable {
-                        glyph: to_cp437('#'),
-                        fg: RGB::named(GREEN),
-                        bg: RGB::named(BLACK),
-                    })
-                    .insert(Position { x, y })
-                    .insert(TileType::Wall);
-            }
-        }
-
-        x += 1;
-        if x > 79 {
-            x = 0;
-            y += 1;
         }
     }
 }
@@ -130,7 +124,7 @@ fn draw_map(mut commands: Commands, map: Res<Map>) {
 fn move_player(
     kb_input: Res<ButtonInput<KeyCode>>,
     mut player_pos: Query<&mut Position, With<Player>>,
-    tiles_pos: Query<(&Position, &TileType), Without<Player>>,
+    map: Res<Map>,
 ) {
     if let Some(kbi) = kb_input.get_pressed().next() {
         let (player_x, player_y) = match kbi {
@@ -142,20 +136,11 @@ fn move_player(
         };
 
         if let Some(mut pos) = player_pos.single_mut().into() {
-            let new_pos_x = (pos.x + player_x).clamp(0, 79);
-            let new_pos_y = (pos.y + player_y).clamp(0, 49);
+            let destination_idx = xy_idx(pos.x + player_x, pos.y + player_y);
 
-            if tiles_pos
-                .iter()
-                .find(|(tile_pos, tile_type)| {
-                    tile_pos.x == new_pos_x
-                        && tile_pos.y == new_pos_y
-                        && **tile_type == TileType::Wall
-                })
-                .is_none()
-            {
-                pos.x = new_pos_x;
-                pos.y = new_pos_y;
+            if map.tiles[destination_idx] != TileType::Wall {
+                pos.x = (pos.x + player_x).clamp(0, 79);
+                pos.y = (pos.y + player_y).clamp(0, 49);
             }
         }
     }

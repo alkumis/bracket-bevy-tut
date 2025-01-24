@@ -1,6 +1,7 @@
 use bevy::asset::AssetMetaCheck;
 use bevy::prelude::*;
 use bracket_lib::bevy::*;
+use bracket_lib::random::RandomNumberGenerator;
 
 fn main() {
     App::new()
@@ -12,7 +13,8 @@ fn main() {
             ..default()
         }))
         .add_plugins(BTermBuilder::simple_80x50())
-        .add_systems(Startup, setup)
+        .insert_resource(Map::new())
+        .add_systems(Startup, (init_player, draw_map).chain())
         .add_systems(Update, (move_player, render).chain())
         .run();
 }
@@ -33,7 +35,51 @@ struct Position {
 #[derive(Component)]
 struct Player;
 
-fn setup(mut commands: Commands) {
+#[derive(PartialEq, Copy, Clone)]
+enum TileType {
+    Wall,
+    Floor,
+}
+
+#[derive(Resource)]
+struct Map {
+    tiles: Vec<TileType>,
+}
+
+pub fn xy_idx(x: i32, y: i32) -> usize {
+    (y as usize * 80) + x as usize
+}
+
+impl Map {
+    pub fn new() -> Self {
+        let mut map = vec![TileType::Floor; 80 * 50];
+
+        for x in 0..80 {
+            map[xy_idx(x, 0)] = TileType::Wall;
+            map[xy_idx(x, 49)] = TileType::Wall;
+        }
+
+        for y in 0..50 {
+            map[xy_idx(0, y)] = TileType::Wall;
+            map[xy_idx(79, y)] = TileType::Wall;
+        }
+
+        let mut rng = RandomNumberGenerator::new();
+
+        for _ in 0..400 {
+            let x = rng.roll_dice(1, 79);
+            let y = rng.roll_dice(1, 49);
+            let idx = xy_idx(x, y);
+            if idx != xy_idx(40, 25) {
+                map[idx] = TileType::Wall;
+            }
+        }
+
+        Map { tiles: map }
+    }
+}
+
+fn init_player(mut commands: Commands) {
     commands
         .spawn_empty()
         .insert(Renderable {
@@ -41,8 +87,42 @@ fn setup(mut commands: Commands) {
             fg: RGB::named(YELLOW),
             bg: RGB::named(BLACK),
         })
-        .insert(Position { x: 0, y: 0 })
+        .insert(Position { x: 40, y: 25 })
         .insert(Player);
+}
+
+fn draw_map(mut commands: Commands, map: Res<Map>) {
+    let (mut x, mut y) = (0, 0);
+    for tile in map.tiles.iter() {
+        match tile {
+            TileType::Floor => {
+                commands
+                    .spawn_empty()
+                    .insert(Renderable {
+                        glyph: to_cp437('.'),
+                        fg: RGB::named(GRAY),
+                        bg: RGB::named(BLACK),
+                    })
+                    .insert(Position { x, y });
+            }
+            TileType::Wall => {
+                commands
+                    .spawn_empty()
+                    .insert(Renderable {
+                        glyph: to_cp437('#'),
+                        fg: RGB::named(GREEN),
+                        bg: RGB::named(BLACK),
+                    })
+                    .insert(Position { x, y });
+            }
+        }
+
+        x += 1;
+        if x > 79 {
+            x = 0;
+            y += 1;
+        }
+    }
 }
 
 fn move_player(
@@ -65,10 +145,17 @@ fn move_player(
     }
 }
 
-fn render(ctx: Res<BracketContext>, renderables: Query<(&Position, &Renderable)>) {
+fn render(
+    ctx: Res<BracketContext>,
+    non_player: Query<(&Position, &Renderable), Without<Player>>,
+    player: Query<(&Position, &Renderable), With<Player>>,
+) {
     ctx.cls();
 
-    renderables.par_iter().for_each(|(pos, render)| {
-        ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph);
-    });
+    non_player
+        .iter()
+        .chain(player.iter())
+        .for_each(|(pos, render)| {
+            ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph);
+        });
 }

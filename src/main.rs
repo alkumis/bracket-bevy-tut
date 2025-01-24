@@ -35,7 +35,7 @@ struct Position {
 #[derive(Component)]
 struct Player;
 
-#[derive(PartialEq, Copy, Clone)]
+#[derive(Component, PartialEq, Copy, Clone)]
 enum TileType {
     Wall,
     Floor,
@@ -103,7 +103,8 @@ fn draw_map(mut commands: Commands, map: Res<Map>) {
                         fg: RGB::named(GRAY),
                         bg: RGB::named(BLACK),
                     })
-                    .insert(Position { x, y });
+                    .insert(Position { x, y })
+                    .insert(TileType::Floor);
             }
             TileType::Wall => {
                 commands
@@ -113,7 +114,8 @@ fn draw_map(mut commands: Commands, map: Res<Map>) {
                         fg: RGB::named(GREEN),
                         bg: RGB::named(BLACK),
                     })
-                    .insert(Position { x, y });
+                    .insert(Position { x, y })
+                    .insert(TileType::Wall);
             }
         }
 
@@ -128,6 +130,7 @@ fn draw_map(mut commands: Commands, map: Res<Map>) {
 fn move_player(
     kb_input: Res<ButtonInput<KeyCode>>,
     mut player_pos: Query<&mut Position, With<Player>>,
+    tiles_pos: Query<(&Position, &TileType), Without<Player>>,
 ) {
     if let Some(kbi) = kb_input.get_pressed().next() {
         let (player_x, player_y) = match kbi {
@@ -139,8 +142,21 @@ fn move_player(
         };
 
         if let Some(mut pos) = player_pos.single_mut().into() {
-            pos.x = (pos.x + player_x).clamp(0, 79);
-            pos.y = (pos.y + player_y).clamp(0, 49);
+            let new_pos_x = (pos.x + player_x).clamp(0, 79);
+            let new_pos_y = (pos.y + player_y).clamp(0, 49);
+
+            if tiles_pos
+                .iter()
+                .find(|(tile_pos, tile_type)| {
+                    tile_pos.x == new_pos_x
+                        && tile_pos.y == new_pos_y
+                        && **tile_type == TileType::Wall
+                })
+                .is_none()
+            {
+                pos.x = new_pos_x;
+                pos.y = new_pos_y;
+            }
         }
     }
 }
@@ -152,6 +168,8 @@ fn render(
 ) {
     ctx.cls();
 
+    // These shenanigans to separate the query and to chain
+    // are so that the player gets set last and doesn't flicker
     non_player
         .iter()
         .chain(player.iter())

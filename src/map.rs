@@ -1,7 +1,12 @@
-use super::components::*;
+use crate::components::*;
 use bevy::prelude::*;
 use bracket_lib::bevy::*;
 use bracket_lib::random::RandomNumberGenerator;
+
+pub fn plugin(app: &mut App) {
+    app.insert_resource(Map::new())
+        .add_systems(Startup, draw_map);
+}
 
 #[derive(Resource)]
 pub struct Map {

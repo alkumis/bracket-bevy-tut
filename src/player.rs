@@ -1,7 +1,13 @@
-use super::components::*;
-use super::map::*;
+use crate::components::*;
+use crate::map::*;
+use crate::AppSet;
 use bevy::prelude::*;
 use bracket_lib::bevy::*;
+
+pub fn plugin(app: &mut App) {
+    app.add_systems(Startup, init_player)
+        .add_systems(Update, move_player.in_set(AppSet::RecordInput));
+}
 
 fn init_player(mut commands: Commands) {
     commands

@@ -8,10 +8,21 @@ use bevy::prelude::*;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(AssetPlugin {
-            meta_check: AssetMetaCheck::Never,
-            ..default()
-        }))
+        .add_plugins(
+            DefaultPlugins
+                .set(AssetPlugin {
+                    meta_check: AssetMetaCheck::Never,
+                    ..default()
+                })
+                .set(WindowPlugin {
+                    primary_window: Window {
+                        fit_canvas_to_parent: true,
+                        ..default()
+                    }
+                    .into(),
+                    ..default()
+                }),
+        )
         .configure_sets(Update, (AppSet::RecordInput, AppSet::Update).chain())
         .add_plugins((map::plugin, player::plugin, render::plugin))
         .run();

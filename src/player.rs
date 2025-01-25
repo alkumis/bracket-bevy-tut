@@ -9,7 +9,8 @@ pub fn plugin(app: &mut App) {
         .add_systems(Update, move_player.in_set(AppSet::RecordInput));
 }
 
-fn spawn_player(mut commands: Commands) {
+fn spawn_player(mut commands: Commands, map: Res<Map>) {
+    let (x, y) = map.rooms[0].center();
     commands
         .spawn_empty()
         .insert(Renderable {
@@ -17,7 +18,7 @@ fn spawn_player(mut commands: Commands) {
             fg: RGB::named(YELLOW),
             bg: RGB::named(BLACK),
         })
-        .insert(Position { x: 40, y: 25 })
+        .insert(Position { x, y })
         .insert(Player);
 }
 
@@ -28,10 +29,10 @@ fn move_player(
 ) {
     if let Some(kbi) = kb_input.get_pressed().next() {
         let (player_x, player_y) = match kbi {
-            KeyCode::ArrowUp | KeyCode::KeyW => (0, -1),
-            KeyCode::ArrowDown | KeyCode::KeyS => (0, 1),
-            KeyCode::ArrowLeft | KeyCode::KeyA => (-1, 0),
-            KeyCode::ArrowRight | KeyCode::KeyD => (1, 0),
+            KeyCode::ArrowLeft | KeyCode::KeyA | KeyCode::KeyH | KeyCode::Numpad4 => (-1, 0),
+            KeyCode::ArrowRight | KeyCode::KeyD | KeyCode::KeyL | KeyCode::Numpad6 => (1, 0),
+            KeyCode::ArrowUp | KeyCode::KeyW | KeyCode::KeyK | KeyCode::Numpad8 => (0, -1),
+            KeyCode::ArrowDown | KeyCode::KeyS | KeyCode::KeyJ | KeyCode::Numpad2 => (0, 1),
             _ => (0, 0),
         };
 

@@ -1,6 +1,7 @@
 mod components;
 mod map;
 mod player;
+mod rect;
 mod render;
 
 use bevy::asset::AssetMetaCheck;

@@ -5,7 +5,7 @@ use bracket_lib::random::RandomNumberGenerator;
 
 pub fn plugin(app: &mut App) {
     app.insert_resource(Map::new())
-        .add_systems(Startup, draw_map);
+        .add_systems(Startup, spawn_map);
 }
 
 #[derive(Resource)]
@@ -46,7 +46,7 @@ impl Map {
     }
 }
 
-fn draw_map(mut commands: Commands, map: Res<Map>) {
+fn spawn_map(mut commands: Commands, map: Res<Map>) {
     for y in 0..50 {
         for x in 0..80 {
             let idx = xy_idx(x, y);

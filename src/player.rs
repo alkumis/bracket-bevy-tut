@@ -37,11 +37,11 @@ fn move_player(
         };
 
         if let Some(mut pos) = player_pos.single_mut().into() {
-            let destination_idx = xy_idx(pos.x + player_x, pos.y + player_y);
+            let destination_idx = map.xy_idx(pos.x + player_x, pos.y + player_y);
 
             if map.tiles[destination_idx] != TileType::Wall {
-                pos.x = (pos.x + player_x).clamp(0, 79);
-                pos.y = (pos.y + player_y).clamp(0, 49);
+                pos.x = (pos.x + player_x).clamp(0, map.width - 1);
+                pos.y = (pos.y + player_y).clamp(0, map.height - 1);
             }
         }
     }

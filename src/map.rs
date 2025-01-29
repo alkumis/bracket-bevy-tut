@@ -1,6 +1,6 @@
 use crate::components::*;
 use crate::rect::Rect;
-use bevy::prelude::*;
+use bevy::{prelude::*, utils::HashSet};
 use bracket_lib::{
     bevy::*,
     prelude::{Algorithm2D, BaseMap},
@@ -19,7 +19,8 @@ pub struct Map {
     pub rooms: Vec<Rect>,
     pub width: i32,
     pub height: i32,
-    pub revealed_tiles: Vec<usize>,
+    pub revealed_tiles: HashSet<usize>,
+    pub visible_tiles: HashSet<usize>,
 }
 
 impl Map {
@@ -66,7 +67,8 @@ impl Map {
             rooms: Vec::new(),
             width: 80,
             height: 50,
-            revealed_tiles: Vec::new(),
+            revealed_tiles: HashSet::new(),
+            visible_tiles: HashSet::new(),
         };
 
         const MAX_ROOMS: i32 = 30;

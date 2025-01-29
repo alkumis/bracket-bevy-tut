@@ -33,7 +33,7 @@ fn move_player(
     mut player_pos: Query<(&mut Position, &mut Viewshed), With<Player>>,
     map: Res<Map>,
 ) {
-    if let Some(kbi) = kb_input.get_pressed().next() {
+    if let Some(kbi) = kb_input.get_just_pressed().next() {
         let (player_x, player_y) = match kbi {
             KeyCode::ArrowLeft | KeyCode::KeyA | KeyCode::KeyH | KeyCode::Numpad4 => (-1, 0),
             KeyCode::ArrowRight | KeyCode::KeyD | KeyCode::KeyL | KeyCode::Numpad6 => (1, 0),

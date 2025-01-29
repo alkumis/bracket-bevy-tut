@@ -1,6 +1,9 @@
 use crate::{components::*, map::Map, AppSet};
 use bevy::prelude::*;
-use bracket_lib::{bevy::Point, prelude::field_of_view};
+use bracket_lib::{
+    bevy::{Point, DARKOLIVEGREEN1, GRAY1, RGB},
+    prelude::field_of_view,
+};
 
 pub fn plugin(app: &mut App) {
     app.add_systems(
@@ -34,23 +37,31 @@ fn set_viewsheds(mut viewsheds: Query<(&mut Viewshed, &Position)>, map: Res<Map>
 }
 
 fn player_visibility(player_viewshed: Query<&Viewshed, With<Player>>, mut map: ResMut<Map>) {
+    map.visible_tiles.clear();
     for vis in player_viewshed.single().visible_tiles.iter() {
         let idx = map.xy_idx(vis.x, vis.y);
-        if !map.revealed_tiles.contains(&idx) {
-            map.revealed_tiles.push(idx);
-        }
+        map.revealed_tiles.insert(idx);
+        map.visible_tiles.insert(idx);
     }
 }
 
 fn set_visibility(
     mut commands: Commands,
-    query: Query<(Entity, &Position, &Renderable), (Without<Player>, Without<Visible>)>,
+    mut query: Query<(Entity, &Position, &mut Renderable), Without<Player>>,
     map: Res<Map>,
 ) {
-    for idx in map.revealed_tiles.iter() {
+    for idx in map.revealed_tiles.clone().iter() {
         let (x, y) = map.idx_xy(*idx);
-        if let Some((entity, _, _)) = query.iter().find(|(_, pos, _)| pos.x == x && pos.y == y) {
-            commands.entity(entity).insert(Visible);
+        if let Some((entity, _, mut render)) = query
+            .iter_mut()
+            .find(|(_, pos, _)| pos.x == x && pos.y == y)
+        {
+            commands.entity(entity).insert_if_new(Visible);
+            render.fg = RGB::named(DARKOLIVEGREEN1);
+            if !map.visible_tiles.contains(idx) {
+                render.fg = RGB::named(GRAY1);
+            }
         }
     }
+    info!["Visible tiles: {:?}", map.visible_tiles];
 }

@@ -1,9 +1,11 @@
 use crate::components::*;
 use crate::rect::Rect;
 use bevy::prelude::*;
-use bracket_lib::prelude::BaseMap;
-use bracket_lib::random::RandomNumberGenerator;
-use bracket_lib::{bevy::*, prelude::Algorithm2D};
+use bracket_lib::{
+    bevy::*,
+    prelude::{Algorithm2D, BaseMap},
+    random::RandomNumberGenerator,
+};
 use std::cmp::{max, min};
 
 pub fn plugin(app: &mut App) {

@@ -23,20 +23,22 @@ fn run_if_dirty(mut viewsheds: Query<&Viewshed>) -> bool {
 }
 
 fn set_viewsheds(mut viewsheds: Query<(&mut Viewshed, &Position)>, map: Res<Map>) {
-    for (mut viewshed, pos) in viewsheds.iter_mut() {
+    viewsheds.par_iter_mut().for_each(|(mut viewshed, pos)| {
         viewshed.dirty = false;
         viewshed.visible_tiles.clear();
         viewshed.visible_tiles = field_of_view(Point::new(pos.x, pos.y), viewshed.range, &*map);
         viewshed
             .visible_tiles
             .retain(|p| p.x >= 0 && p.x < map.width && p.y >= 0 && p.y < map.height);
-    }
+    });
 }
 
 fn player_visibility(player_viewshed: Query<&Viewshed, With<Player>>, mut map: ResMut<Map>) {
     for vis in player_viewshed.single().visible_tiles.iter() {
         let idx = map.xy_idx(vis.x, vis.y);
-        map.revealed_tiles.push(idx);
+        if !map.revealed_tiles.contains(&idx) {
+            map.revealed_tiles.push(idx);
+        }
     }
 }
 

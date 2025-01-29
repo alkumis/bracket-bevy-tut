@@ -5,13 +5,13 @@ use bracket_lib::bevy::*;
 
 pub fn plugin(app: &mut App) {
     app.add_plugins(BTermBuilder::simple_80x50())
-        .add_systems(Update, render.in_set(AppSet::Update));
+        .add_systems(Update, render.in_set(AppSet::Render));
 }
 
 fn render(
     ctx: Res<BracketContext>,
-    non_player: Query<(&Position, &Renderable), Without<Player>>,
-    player: Query<(&Position, &Renderable), With<Player>>,
+    non_player: Query<(&Position, &Renderable), (Without<Player>, With<Visible>)>,
+    player: Query<(&Position, &Renderable), (With<Player>, With<Renderable>)>,
 ) {
     ctx.cls();
 

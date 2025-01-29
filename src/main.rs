@@ -3,6 +3,7 @@ mod map;
 mod player;
 mod rect;
 mod render;
+mod visibility;
 
 use bevy::asset::AssetMetaCheck;
 use bevy::prelude::*;
@@ -24,8 +25,13 @@ fn main() {
                     ..default()
                 }),
         )
-        .configure_sets(Update, (AppSet::RecordInput, AppSet::Update).chain())
-        .add_plugins((map::plugin, player::plugin, render::plugin))
+        .configure_sets(Update, (AppSet::RecordInput, AppSet::Render).chain())
+        .add_plugins((
+            map::plugin,
+            player::plugin,
+            visibility::plugin,
+            render::plugin,
+        ))
         .run();
 }
 
@@ -33,6 +39,8 @@ fn main() {
 enum AppSet {
     /// Record player input.
     RecordInput,
+    /// Tick systems based on input.
+    Tick,
     /// Do everything else (consider splitting this into further variants).
-    Update,
+    Render,
 }

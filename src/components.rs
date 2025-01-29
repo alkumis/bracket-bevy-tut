@@ -17,8 +17,18 @@ pub struct Position {
 #[derive(Component)]
 pub struct Player;
 
+#[derive(Component)]
+pub struct Visible;
+
 #[derive(Component, PartialEq, Copy, Clone)]
 pub enum TileType {
     Wall,
     Floor,
+}
+
+#[derive(Component)]
+pub struct Viewshed {
+    pub visible_tiles: Vec<Point>,
+    pub range: i32,
+    pub dirty: bool,
 }

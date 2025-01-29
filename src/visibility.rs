@@ -63,5 +63,4 @@ fn set_visibility(
             }
         }
     }
-    info!["Visible tiles: {:?}", map.visible_tiles];
 }

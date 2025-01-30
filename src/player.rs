@@ -50,7 +50,7 @@ fn move_player(
                 viewshed.dirty = true;
             }
 
-            let destination_idx = map.xy_idx(pos.x + player_x, pos.y + player_y);
+            let destination_idx = map.xy_idx(player_x, player_y);
 
             if map.tiles[destination_idx] != TileType::Wall {
                 (pos.x, pos.y) = (player_x, player_y);

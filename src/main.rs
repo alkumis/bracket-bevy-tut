@@ -25,7 +25,10 @@ fn main() {
                     ..default()
                 }),
         )
-        .configure_sets(Update, (AppSet::RecordInput, AppSet::Render).chain())
+        .configure_sets(
+            Update,
+            (AppSet::RecordInput, AppSet::Tick, AppSet::Render).chain(),
+        )
         .add_plugins((
             map::plugin,
             player::plugin,

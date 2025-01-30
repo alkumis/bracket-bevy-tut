@@ -1,7 +1,7 @@
 use crate::{components::*, map::Map, AppSet};
 use bevy::prelude::*;
 use bracket_lib::{
-    bevy::{Point, DARKOLIVEGREEN1, GRAY1, RGB},
+    bevy::{Point, DARKOLIVEGREEN, DARKOLIVEGREEN1, GRAY1, RGB},
     prelude::field_of_view,
 };
 
@@ -57,9 +57,13 @@ fn set_visibility(
             .find(|(_, pos, _)| pos.x == x && pos.y == y)
         {
             commands.entity(entity).insert_if_new(Visible);
-            render.fg = RGB::named(DARKOLIVEGREEN1);
-            if !map.visible_tiles.contains(idx) {
-                render.fg = RGB::named(GRAY1);
+            render.fg = if map.visible_tiles.contains(idx) {
+                match map.tiles[*idx] {
+                    TileType::Floor => RGB::named(DARKOLIVEGREEN),
+                    TileType::Wall => RGB::named(DARKOLIVEGREEN1),
+                }
+            } else {
+                RGB::named(GRAY1)
             }
         }
     }

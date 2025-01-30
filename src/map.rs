@@ -134,7 +134,7 @@ fn spawn_map(mut commands: Commands, map: Res<Map>) {
                         .spawn_empty()
                         .insert(Renderable {
                             glyph: to_cp437('.'),
-                            fg: RGB::named(GRAY),
+                            fg: RGB::named(DARKOLIVEGREEN),
                             bg: RGB::named(BLACK),
                         })
                         .insert(Position { x, y });

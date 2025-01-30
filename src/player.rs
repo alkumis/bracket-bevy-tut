@@ -43,17 +43,17 @@ fn move_player(
         };
 
         if let Some((mut pos, mut viewshed)) = player_pos.single_mut().into() {
+            let player_x = (pos.x + player_x).clamp(0, map.width - 1);
+            let player_y = (pos.y + player_y).clamp(0, map.height - 1);
+
             if player_x + player_y != 0 {
                 viewshed.dirty = true;
             }
 
-            let destination_idx = map
-                .xy_idx(pos.x + player_x, pos.y + player_y)
-                .clamp(0, map.width as usize * map.height as usize);
+            let destination_idx = map.xy_idx(pos.x + player_x, pos.y + player_y);
 
             if map.tiles[destination_idx] != TileType::Wall {
-                pos.x = (pos.x + player_x).clamp(0, map.width - 1);
-                pos.y = (pos.y + player_y).clamp(0, map.height - 1);
+                (pos.x, pos.y) = (player_x, player_y);
             }
         }
     }

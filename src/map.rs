@@ -137,7 +137,8 @@ fn spawn_map(mut commands: Commands, map: Res<Map>) {
                             fg: RGB::named(DARKOLIVEGREEN),
                             bg: RGB::named(BLACK),
                         })
-                        .insert(Position { x, y });
+                        .insert(Position { x, y })
+                        .insert(TileType::Floor);
                 }
                 TileType::Wall => {
                     commands
@@ -147,7 +148,8 @@ fn spawn_map(mut commands: Commands, map: Res<Map>) {
                             fg: RGB::named(DARKOLIVEGREEN1),
                             bg: RGB::named(BLACK),
                         })
-                        .insert(Position { x, y });
+                        .insert(Position { x, y })
+                        .insert(TileType::Wall);
                 }
             }
         }

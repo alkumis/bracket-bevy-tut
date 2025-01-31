@@ -1,4 +1,4 @@
-use crate::{components::*, map::Map, AppSet};
+use crate::{components::*, map::Map, AppSet, RunningState};
 use bevy::prelude::*;
 use bracket_lib::{
     bevy::{Point, DARKOLIVEGREEN, DARKOLIVEGREEN1, GRAY1, RGB},
@@ -8,26 +8,20 @@ use bracket_lib::{
 pub fn plugin(app: &mut App) {
     app.add_systems(
         Update,
-        (set_viewsheds, player_visibility, set_visibility)
+        (
+            set_viewsheds,
+            player_visibility,
+            tile_visibility,
+            monster_visibility,
+        )
             .chain()
-            .run_if(run_if_dirty)
+            .run_if(in_state(RunningState::Running).or(in_state(RunningState::Load)))
             .in_set(AppSet::Tick),
     );
 }
 
-fn run_if_dirty(mut viewsheds: Query<&Viewshed>) -> bool {
-    let mut is_dirty = false;
-
-    if let Some(viewshed) = viewsheds.iter_mut().next() {
-        is_dirty = viewshed.dirty;
-    }
-
-    is_dirty
-}
-
 fn set_viewsheds(mut viewsheds: Query<(&mut Viewshed, &Position)>, map: Res<Map>) {
     viewsheds.par_iter_mut().for_each(|(mut viewshed, pos)| {
-        viewshed.dirty = false;
         viewshed.visible_tiles.clear();
         viewshed.visible_tiles = field_of_view(Point::new(pos.x, pos.y), viewshed.range, &*map);
         viewshed
@@ -45,9 +39,9 @@ fn player_visibility(player_viewshed: Query<&Viewshed, With<Player>>, mut map: R
     }
 }
 
-fn set_visibility(
+fn tile_visibility(
     mut commands: Commands,
-    mut query: Query<(Entity, &Position, &mut Renderable), Without<Player>>,
+    mut query: Query<(Entity, &Position, &mut Renderable), With<TileType>>,
     map: Res<Map>,
 ) {
     for idx in map.revealed_tiles.clone().iter() {
@@ -65,6 +59,21 @@ fn set_visibility(
             } else {
                 RGB::named(GRAY1)
             }
+        }
+    }
+}
+
+fn monster_visibility(
+    mut commands: Commands,
+    mut query: Query<(Entity, &Position), With<Monster>>,
+    map: Res<Map>,
+) {
+    for (entity, pos) in query.iter_mut() {
+        let idx = map.xy_idx(pos.x, pos.y);
+        if map.visible_tiles.contains(&idx) {
+            commands.entity(entity).insert_if_new(Visible);
+        } else {
+            commands.entity(entity).remove::<Visible>();
         }
     }
 }

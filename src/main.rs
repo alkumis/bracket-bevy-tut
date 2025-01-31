@@ -1,5 +1,6 @@
 mod components;
 mod map;
+mod monster;
 mod player;
 mod rect;
 mod render;
@@ -25,12 +26,14 @@ fn main() {
                     ..default()
                 }),
         )
+        .init_state::<RunningState>()
         .configure_sets(
             Update,
             (AppSet::RecordInput, AppSet::Tick, AppSet::Render).chain(),
         )
         .add_plugins((
             map::plugin,
+            monster::plugin,
             player::plugin,
             visibility::plugin,
             render::plugin,
@@ -46,4 +49,12 @@ enum AppSet {
     Tick,
     /// Do everything else (consider splitting this into further variants).
     Render,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, Default, States)]
+enum RunningState {
+    #[default]
+    Load,
+    Paused,
+    Running,
 }

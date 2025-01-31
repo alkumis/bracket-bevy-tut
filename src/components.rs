@@ -30,5 +30,7 @@ pub enum TileType {
 pub struct Viewshed {
     pub visible_tiles: Vec<Point>,
     pub range: i32,
-    pub dirty: bool,
 }
+
+#[derive(Component, Debug)]
+pub struct Monster;

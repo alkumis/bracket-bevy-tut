@@ -1,6 +1,7 @@
 use crate::components::*;
 use crate::map::*;
 use crate::AppSet;
+use crate::RunningState;
 use bevy::prelude::*;
 use bracket_lib::bevy::*;
 
@@ -22,7 +23,6 @@ fn spawn_player(mut commands: Commands, map: Res<Map>) {
         .insert(Viewshed {
             visible_tiles: Vec::new(),
             range: 8,
-            dirty: true,
         })
         .insert(Visible)
         .insert(Player);
@@ -30,31 +30,36 @@ fn spawn_player(mut commands: Commands, map: Res<Map>) {
 
 fn move_player(
     kb_input: Res<ButtonInput<KeyCode>>,
-    mut player_pos: Query<(&mut Position, &mut Viewshed), With<Player>>,
+    mut player_pos: Query<&mut Position, With<Player>>,
     map: Res<Map>,
+    mut next_state: ResMut<NextState<RunningState>>,
 ) {
-    if let Some(kbi) = kb_input.get_just_pressed().next() {
-        let (player_x, player_y) = match kbi {
-            KeyCode::ArrowLeft | KeyCode::KeyA | KeyCode::KeyH | KeyCode::Numpad4 => (-1, 0),
-            KeyCode::ArrowRight | KeyCode::KeyD | KeyCode::KeyL | KeyCode::Numpad6 => (1, 0),
-            KeyCode::ArrowUp | KeyCode::KeyW | KeyCode::KeyK | KeyCode::Numpad8 => (0, -1),
-            KeyCode::ArrowDown | KeyCode::KeyS | KeyCode::KeyJ | KeyCode::Numpad2 => (0, 1),
-            _ => (0, 0),
-        };
+    match kb_input.get_just_pressed().next() {
+        Some(kbi) => {
+            let (player_x, player_y) = match kbi {
+                KeyCode::ArrowLeft | KeyCode::KeyA | KeyCode::KeyH | KeyCode::Numpad4 => (-1, 0),
+                KeyCode::ArrowRight | KeyCode::KeyD | KeyCode::KeyL | KeyCode::Numpad6 => (1, 0),
+                KeyCode::ArrowUp | KeyCode::KeyW | KeyCode::KeyK | KeyCode::Numpad8 => (0, -1),
+                KeyCode::ArrowDown | KeyCode::KeyS | KeyCode::KeyJ | KeyCode::Numpad2 => (0, 1),
+                _ => (0, 0),
+            };
 
-        if let Some((mut pos, mut viewshed)) = player_pos.single_mut().into() {
-            let player_x = (pos.x + player_x).clamp(0, map.width - 1);
-            let player_y = (pos.y + player_y).clamp(0, map.height - 1);
+            if (player_x, player_y) == (0, 0) {
+                next_state.set(RunningState::Paused);
+            } else {
+                if let Some(mut pos) = player_pos.single_mut().into() {
+                    let player_x = (pos.x + player_x).clamp(0, map.width - 1);
+                    let player_y = (pos.y + player_y).clamp(0, map.height - 1);
 
-            if player_x + player_y != 0 {
-                viewshed.dirty = true;
-            }
+                    let destination_idx = map.xy_idx(player_x, player_y);
 
-            let destination_idx = map.xy_idx(player_x, player_y);
-
-            if map.tiles[destination_idx] != TileType::Wall {
-                (pos.x, pos.y) = (player_x, player_y);
+                    if map.tiles[destination_idx] != TileType::Wall {
+                        (pos.x, pos.y) = (player_x, player_y);
+                    }
+                }
+                next_state.set(RunningState::Running);
             }
         }
+        None => next_state.set(RunningState::Paused),
     }
 }

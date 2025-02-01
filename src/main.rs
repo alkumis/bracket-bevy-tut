@@ -29,7 +29,13 @@ fn main() {
         .init_state::<RunningState>()
         .configure_sets(
             Update,
-            (AppSet::RecordInput, AppSet::Tick, AppSet::Render).chain(),
+            (
+                AppSet::RecordInput,
+                AppSet::Visibility,
+                AppSet::Update,
+                AppSet::Render,
+            )
+                .chain(),
         )
         .add_plugins((
             map::plugin,
@@ -46,7 +52,9 @@ enum AppSet {
     /// Record player input.
     RecordInput,
     /// Tick systems based on input.
-    Tick,
+    Visibility,
+    /// Update - everything else goes here
+    Update,
     /// Do everything else (consider splitting this into further variants).
     Render,
 }

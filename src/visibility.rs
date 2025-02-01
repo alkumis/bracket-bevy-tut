@@ -16,7 +16,7 @@ pub fn plugin(app: &mut App) {
         )
             .chain()
             .run_if(not(in_state(RunningState::Paused)))
-            .in_set(AppSet::Tick),
+            .in_set(AppSet::Visibility),
     );
 }
 

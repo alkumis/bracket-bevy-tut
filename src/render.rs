@@ -1,11 +1,16 @@
 use crate::components::*;
 use crate::AppSet;
+use crate::RunningState;
 use bevy::prelude::*;
 use bracket_lib::bevy::*;
 
 pub fn plugin(app: &mut App) {
-    app.add_plugins(BTermBuilder::simple_80x50())
-        .add_systems(Update, render.in_set(AppSet::Render));
+    app.add_plugins(BTermBuilder::simple_80x50()).add_systems(
+        Update,
+        render
+            .run_if(not(in_state(RunningState::Paused)))
+            .in_set(AppSet::Render),
+    );
 }
 
 fn render(

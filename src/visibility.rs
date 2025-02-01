@@ -15,7 +15,7 @@ pub fn plugin(app: &mut App) {
             monster_visibility,
         )
             .chain()
-            .run_if(in_state(RunningState::Running).or(in_state(RunningState::Load)))
+            .run_if(not(in_state(RunningState::Paused)))
             .in_set(AppSet::Tick),
     );
 }

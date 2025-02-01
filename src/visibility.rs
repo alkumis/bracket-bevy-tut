@@ -41,12 +41,12 @@ fn player_visibility(player_viewshed: Query<&Viewshed, With<Player>>, mut map: R
 
 fn tile_visibility(
     mut commands: Commands,
-    mut query: Query<(Entity, &Position, &mut Renderable), With<TileType>>,
+    mut tiles: Query<(Entity, &Position, &mut Renderable), With<TileType>>,
     map: Res<Map>,
 ) {
     for idx in map.revealed_tiles.clone().iter() {
         let (x, y) = map.idx_xy(*idx);
-        if let Some((entity, _, mut render)) = query
+        if let Some((entity, _, mut render)) = tiles
             .iter_mut()
             .find(|(_, pos, _)| pos.x == x && pos.y == y)
         {
@@ -65,10 +65,10 @@ fn tile_visibility(
 
 fn monster_visibility(
     mut commands: Commands,
-    mut query: Query<(Entity, &Position), With<Monster>>,
+    mut monsters: Query<(Entity, &Position), With<Monster>>,
     map: Res<Map>,
 ) {
-    for (entity, pos) in query.iter_mut() {
+    for (entity, pos) in monsters.iter_mut() {
         let idx = map.xy_idx(pos.x, pos.y);
         if map.visible_tiles.contains(&idx) {
             commands.entity(entity).insert_if_new(Visible);

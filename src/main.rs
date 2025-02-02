@@ -39,9 +39,9 @@ fn main() {
         )
         .add_plugins((
             map::plugin,
-            monster::plugin,
             player::plugin,
             visibility::plugin,
+            monster::plugin,
             render::plugin,
         ))
         .run();
@@ -55,7 +55,7 @@ enum AppSet {
     Visibility,
     /// Update - everything else goes here
     Update,
-    /// Do everything else (consider splitting this into further variants).
+    /// Bracket-lib rendering happens here
     Render,
 }
 

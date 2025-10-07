@@ -1,6 +1,6 @@
 use crate::components::*;
 use crate::rect::Rect;
-use bevy::{prelude::*, utils::HashSet};
+use bevy::{platform::collections::HashSet, prelude::*};
 use bracket_lib::{
     bevy::*,
     prelude::{Algorithm2D, BaseMap},

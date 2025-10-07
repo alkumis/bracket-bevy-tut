@@ -47,7 +47,7 @@ fn move_player(
             if (player_x, player_y) == (0, 0) {
                 next_state.set(RunningState::Paused);
             } else {
-                if let Some(mut pos) = player_pos.single_mut().into() {
+                if let Some(mut pos) = player_pos.single_mut().unwrap().into() {
                     let player_x = (pos.x + player_x).clamp(0, map.width - 1);
                     let player_y = (pos.y + player_y).clamp(0, map.height - 1);
 

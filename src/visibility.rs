@@ -32,7 +32,7 @@ fn set_viewsheds(mut viewsheds: Query<(&mut Viewshed, &Position)>, map: Res<Map>
 
 fn player_visibility(player_viewshed: Query<&Viewshed, With<Player>>, mut map: ResMut<Map>) {
     map.visible_tiles.clear();
-    for vis in player_viewshed.single().visible_tiles.iter() {
+    for vis in player_viewshed.single().unwrap().visible_tiles.iter() {
         let idx = map.xy_idx(vis.x, vis.y);
         map.revealed_tiles.insert(idx);
         map.visible_tiles.insert(idx);

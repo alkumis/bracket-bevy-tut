@@ -15,6 +15,7 @@ pub fn plugin(app: &mut App) {
 
 fn render(
     ctx: Res<BracketContext>,
+    // non_player: Query<(&Position, &Renderable), With<Visible>>,
     non_player: Query<(&Position, &Renderable), (Without<Player>, With<Visible>)>,
     player: Query<(&Position, &Renderable), (With<Player>, With<Renderable>)>,
 ) {
@@ -24,6 +25,7 @@ fn render(
     // are so that the player gets set last and doesn't flicker
     non_player
         .iter()
+        // .rev()
         .chain(player.iter())
         .for_each(|(pos, render)| {
             ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph);

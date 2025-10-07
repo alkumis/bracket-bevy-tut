@@ -1,7 +1,7 @@
-use crate::components::*;
-use crate::map::*;
 use crate::AppSet;
 use crate::RunningState;
+use crate::components::*;
+use crate::map::*;
 use bevy::prelude::*;
 use bracket_lib::bevy::*;
 

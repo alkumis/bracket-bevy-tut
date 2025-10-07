@@ -1,7 +1,7 @@
-use crate::{components::*, map::Map, AppSet, RunningState};
+use crate::{AppSet, RunningState, components::*, map::Map};
 use bevy::prelude::*;
 use bracket_lib::{
-    bevy::{to_cp437, Point, BLACK, RED, RGB},
+    bevy::{BLACK, Point, RED, RGB, to_cp437},
     random::RandomNumberGenerator,
 };
 

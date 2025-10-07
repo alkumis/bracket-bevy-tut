@@ -1,7 +1,7 @@
-use crate::{components::*, map::Map, AppSet, RunningState};
+use crate::{AppSet, RunningState, components::*, map::Map};
 use bevy::prelude::*;
 use bracket_lib::{
-    bevy::{Point, DARKOLIVEGREEN, DARKOLIVEGREEN1, GRAY1, RGB},
+    bevy::{DARKOLIVEGREEN, DARKOLIVEGREEN1, GRAY1, Point, RGB},
     prelude::field_of_view,
 };
 

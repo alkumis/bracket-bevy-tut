@@ -58,11 +58,7 @@ jobs:
         with:
           components: clippy
       - name: Install Dependencies
-<<<<<<< HEAD
-        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev libwayland-dev
-=======
-        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev libfontconfig1-dev
->>>>>>> 3ff9ef9 (Added a char and fixes to CI workflows)
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev libwayland-dev libfontconfig1-dev
       - name: Run clippy
         run: cargo clippy -- -D warnings
 

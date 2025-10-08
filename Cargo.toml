@@ -27,3 +27,8 @@ bracket-lib = { git = "https://github.com/alkumis/bracket-lib" }
 [lints.clippy]
 too_many_arguments = "allow"
 type_complexity = "allow"
+
+[target.'cfg(all(target_family = "wasm", any(target_os = "unknown", target_os = "none")))'.dependencies]
+getrandom = { version = "0.3", features = ["wasm_js"] }
+getrandom_02 = { version = "0.2", features = ["js"], package = "getrandom" }
+uuid = { version = "1.18", features = ["js"] } # This can be changed with features `rng-getrandom` or `rng-rand`, but one must be specified

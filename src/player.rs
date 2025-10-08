@@ -25,7 +25,10 @@ fn spawn_player(mut commands: Commands, map: Res<Map>) {
             range: 8,
         })
         .insert(Visible)
-        .insert(Player);
+        .insert(Player)
+        .insert(EntityName {
+            name: "Player".to_string(),
+        });
 }
 
 fn move_player(

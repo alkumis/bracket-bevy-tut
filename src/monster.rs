@@ -45,11 +45,11 @@ fn spawn_monsters(mut commands: Commands, map: Res<Map>) {
 
 fn shout_insults(
     player_pos: Query<&Position, With<Player>>,
-    mut monsters: Query<(&EntityName, &Viewshed), With<Monster>>,
+    monsters: Query<(&EntityName, &Viewshed), With<Monster>>,
 ) {
     let player_pos = player_pos.single().unwrap();
     let player_pos = Point::new(player_pos.x, player_pos.y);
-    for (name, viewshed) in monsters.iter_mut() {
+    for (name, viewshed) in monsters.iter() {
         if viewshed.visible_tiles.contains(&player_pos) {
             info!["{:?} shouts insults", name.name];
         }
